@@ -1,0 +1,3 @@
+create database electric_vehicle
+use electric_vehicle
+show tables

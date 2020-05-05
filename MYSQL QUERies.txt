@@ -1,0 +1,90 @@
+#ACTIVE POWER
+Select Batt_dischg_Current,Motor_op_Voltage
+from value_instant;
+
+
+#SOC
+select batt_voltage, amphr
+from value_instant, parts, vehicle
+where part_id=p_id and l_id=license_id and amphr>0;
+
+
+#SAFETY
+(SELECT L_id,T_id,Charging_door,Ignition_key,Seatbelt_sensor
+FROM VALUE_INSTANT
+WHERE Ignition_key=1 AND Seatbelt_sensor=0)
+UNION
+(SELECT L_id,T_id,Charging_door,Ignition_key,Seatbelt_sensor
+FROM VALUE_INSTANT
+WHERE Ignition_key=1 AND Charging_door=1);
+
+#Safety alternate query	
+SELECT L_id,T_id,Charging_door,Ignition_key,Seatbelt_sensor
+FROM VALUE_INSTANT
+WHERE Ignition_key=1 AND Seatbelt_sensor=0 or Ignition_key=1 AND Charging_door=1;
+
+#WHEEL
+
+ALTER TABLE PARTS ADD Wheel_Flag CHAR(9);
+ALTER TABLE PARTS ADD Wheel_rad VARCHAR(5);
+
+INSERT INTO PARTS (Part_id,Manufacturer_name,Motor_flag,Max_rpm, Rated_Power,Battery_Flag,Amphr,Wheel_Flag,Wheel_rad)
+VALUES ('wheel01','tata',NULL,NULL,NULL,NULL,NULL,'wheel',13),
+('wheel02','tata',NULL,NULL,NULL,NULL,NULL,'wheel',14),
+('wheel03','tata',NULL,NULL,NULL,NULL,NULL,'wheel',15);
+
+INSERT INTO Vehicle (Chassis_id,License_id,P_id)
+VALUES ('ev101','IITGN EV101','wheel01'),
+('ev102','IITGN EV102','wheel02'),
+('ev103','IITGN EV103','wheel03');
+
+#MILEAGE
+Select Motor_inst_RPM,SOC
+from value_instant;
+
+#NEW MANUFACTURER
+
+
+INSERT INTO PARTS (Part_id,Manufacturer_name,Motor_flag,Max_rpm, Rated_Power,Battery_Flag,Amphr,Wheel_Flag,Wheel_rad)
+VALUES ('battery04','Exide',NULL,NULL,NULL,'Battery','100',NULL,NULL), 
+('battery05','Exide',NULL,NULL,NULL,'Battery','120',NULL,NULL), 
+('battery06','Exide',NULL,NULL,NULL,'Battery','150',NULL,NULL); 
+
+
+UPDATE Vehicle
+SET p_id ='battery04'
+WHERE p_id ='battery01';
+
+UPDATE Vehicle
+SET p_id ='battery05'
+WHERE p_id ='battery02';
+
+UPDATE Vehicle
+SET p_id ='battery06'
+WHERE p_id ='battery03';
+
+
+INSERT INTO Time (HH_MM_SS,Time_id,dd_mm_yy)
+VALUES (100000,11,21215),
+(120000,12,21215),
+(140000,13,21215),
+(160000,14,21215),
+(180000,15,21215);
+
+
+INSERT INTO Value_instant (C_id,L_id,Batt_avg_temp,Batt_chg_Current,Batt_dischg_Current,Batt_voltage,Charging_door,Ignition_key,Seatbelt_sensor,Motor_acc,Motor_status,Motor_inst_RPM,Motor_Op_Voltage,T_id)
+VALUES ('ev101','IITGN EV101',32,0,80,12,0,1,1,3,1,2000,60,11),
+('ev101','IITGN EV101',35,0,60,11.7,0,1,1,0,1,3000,60,12),
+('ev101','IITGN EV101',40,0,60,11.2,0,1,1,1,1,2000,60,13),
+('ev101','IITGN EV101',45,20,0,10.7,1,0,0,0,0,0,0,14),
+('ev101','IITGN EV101',50,15,0,11.7,1,0,0,0,0,0,0,15),
+('ev102','IITGN EV102',30,0,100,12,0,1,1,3,1,2000,60,11),
+('ev102','IITGN EV102',32,0,80,11.9,0,1,1,0,1,3000,60,12),
+('ev102','IITGN EV102',38,0,80,11.5,0,1,1,1,1,2000,60,13),
+('ev102','IITGN EV102',41,20,0,11.2,1,0,0,0,0,0,0,14),
+('ev102','IITGN EV102',48,15,0,11.9,1,0,0,0,0,0,0,15),
+('ev103','IITGN EV103',44,0,90,12,0,1,1,3,1,2000,60,11),
+('ev103','IITGN EV103',46,0,70,11.7,0,1,1,0,1,3000,60,12),
+('ev103','IITGN EV103',41,0,0,11.2,0,1,0,1,0,0,0,13),
+('ev103','IITGN EV103',44,20,0,10.7,1,0,0,0,0,0,0,14),
+('ev103','IITGN EV103',61,15,0,11.7,1,0,0,0,0,0,0,15);
